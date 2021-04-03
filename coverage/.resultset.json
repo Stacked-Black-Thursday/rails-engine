@@ -273,12 +273,23 @@
       "/Users/gvieve/Turing/3module/projects/rails_engine_project/rails-engine/config/routes.rb": {
         "lines": [
           1,
+          1,
+          1,
+          1,
+          1,
+          null,
+          null,
           null,
           null
         ]
       },
       "/Users/gvieve/Turing/3module/projects/rails_engine_project/rails-engine/app/models/customer.rb": {
         "lines": [
+          1,
+          1,
+          1,
+          1,
+          1,
           1,
           null
         ]
@@ -296,11 +307,20 @@
           null,
           1,
           1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          null,
           null
         ]
       },
       "/Users/gvieve/Turing/3module/projects/rails_engine_project/rails-engine/app/models/invoice_item.rb": {
         "lines": [
+          1,
+          1,
+          1,
           1,
           1,
           1,
@@ -313,11 +333,22 @@
           null,
           1,
           1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          null,
           null
         ]
       },
       "/Users/gvieve/Turing/3module/projects/rails_engine_project/rails-engine/app/models/invoice.rb": {
         "lines": [
+          1,
+          1,
+          1,
+          1,
           1,
           1,
           1,
@@ -330,11 +361,21 @@
           null,
           1,
           1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          null,
           null
         ]
       },
       "/Users/gvieve/Turing/3module/projects/rails_engine_project/rails-engine/app/models/item.rb": {
         "lines": [
+          1,
+          1,
+          1,
+          1,
           1,
           1,
           null
@@ -346,11 +387,22 @@
           null,
           1,
           1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          null,
           null
         ]
       },
       "/Users/gvieve/Turing/3module/projects/rails_engine_project/rails-engine/app/models/merchant.rb": {
         "lines": [
+          1,
+          1,
+          1,
+          1,
+          1,
           1,
           null
         ]
@@ -361,6 +413,9 @@
           null,
           1,
           1,
+          2,
+          2,
+          null,
           null
         ]
       },
@@ -368,10 +423,11 @@
         "lines": [
           1,
           1,
+          1,
           null
         ]
       }
     },
-    "timestamp": 1617396632
+    "timestamp": 1617409488
   }
 }
