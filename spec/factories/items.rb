@@ -1,8 +1,10 @@
 FactoryBot.define do
   factory :item do
-    name { "MyString" }
-    description { "MyString" }
-    unit_price { "9.99" }
-    merchant { nil }
+    name { Faker::Dessert.variety }
+    description { Faker::GreekPhilosophers.quote }
+    sequence :unit_price do |n|
+      n + 10
+    end
+    merchant
   end
 end
