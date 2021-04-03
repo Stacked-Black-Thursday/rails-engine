@@ -16,8 +16,6 @@ describe "Merchants API" do
         expect(merchants[:data].first).to have_key(:id)
         expect(merchants[:data].first[:id]).to be_a(String)
         expect(merchants[:data].first[:attributes]).to be_a(Hash)
-        expect(merchants[:data].first[:attributes]).to have_key(:id)
-        expect(merchants[:data].first[:attributes][:id]).to be_a(Integer)
         expect(merchants[:data].first[:attributes]).to have_key(:name)
         expect(merchants[:data].first[:attributes][:name]).to be_a(String)
       end
@@ -32,8 +30,8 @@ describe "Merchants API" do
         expect(response).to be_successful
         expect(response.status).to eq(200)
         expect(merchants1.count).to eq(20)
-        expect(merchants1.second[:attributes][:id]).to eq(merchants1.first[:attributes][:id] + 1)
-        expect(merchants1.last[:attributes][:id]).to eq(merchants1.first[:attributes][:id] + 19)
+        expect(merchants1.second[:id].to_i).to eq(merchants1.first[:id].to_i + 1)
+        expect(merchants1.last[:id].to_i).to eq(merchants1.first[:id].to_i + 19)
 
         get '/api/v1/merchants?page=2'
 
@@ -41,9 +39,9 @@ describe "Merchants API" do
         expect(response).to be_successful
         expect(response.status).to eq(200)
         expect(merchants2.count).to eq(20)
-        expect(merchants2.first[:attributes][:id]).to eq(merchants1.first[:attributes][:id] + 20)
-        expect(merchants2.second[:attributes][:id]).to eq(merchants2.first[:attributes][:id] + 1)
-        expect(merchants2.last[:attributes][:id]).to eq(merchants2.first[:attributes][:id] + 19)
+        expect(merchants2.first[:id].to_i).to eq(merchants1.first[:id].to_i + 20)
+        expect(merchants2.second[:id].to_i).to eq(merchants2.first[:id].to_i + 1)
+        expect(merchants2.last[:id].to_i).to eq(merchants2.first[:id].to_i + 19)
       end
 
       it "sends a list of up to 20 merchants when there are less than that in the DB" do
