@@ -73,8 +73,37 @@ describe "Merchants API" do
     end
   end
 
-  it "sends one merchant" do
+  describe 'one merchant' do
+    describe 'happy path' do
+      it "sends a single merchant by id" do
+        merchants = create_list(:merchant, 2)
+        merchant = merchants.first
 
+        get "/api/v1/merchants/#{merchant.id}"
+
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+        expect(data.count).to eq(1)
+        expect(data[:data]).to have_key(:id)
+        expect(data[:data][:id]).to be_a(String)
+        expect(data[:data][:id]).to_not eq(merchants.last.id)
+        expect(data[:data][:attributes]).to be_a(Hash)
+        expect(data[:data][:attributes]).to have_key(:name)
+        expect(data[:data][:attributes][:name]).to be_a(String)
+      end
+    end
+
+    describe 'sad path' do
+      it "returns a 404 when the id is not found" do
+        get '/api/v1/merchants/8923987297'
+
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(response.status).to eq(404)
+        expect(response).to be_not_found
+      end
+    end
   end
 
   it "sends a list of all items for a single merchant by id" do
