@@ -112,7 +112,169 @@ describe "Items API" do
     end
   end
 
-  it "sends a list of all items for a single merchant by id" do
+  describe 'create an item' do
+    describe 'happy path' do
+      it "creates an item record when provided valid data" do
+        merchant = create(:merchant)
+        item_params = ({
+                      name: 'Foo wand',
+                      description: 'Creates bar magic',
+                      unit_price: 15.99,
+                      merchant_id: merchant.id
+                      })
+        headers = {"CONTENT_TYPE" => "application/json"}
 
+        post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
+        created_item = Item.last
+        returned_json = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(created_item.name).to eq(item_params[:name])
+        expect(created_item.merchant.id).to eq(item_params[:merchant_id])
+        expect(created_item.description).to eq(item_params[:description])
+        expect(created_item.unit_price).to eq(item_params[:unit_price])
+        expect(response).to be_successful
+        expect(response.status).to eq(201)
+        expect(returned_json[:id]).to be_a(String)
+        expect(returned_json[:attributes]).to be_a(Hash)
+        expect(returned_json[:attributes]).to have_key(:name)
+        expect(returned_json[:attributes][:name]).to be_a(String)
+        expect(returned_json[:attributes]).to have_key(:unit_price)
+        expect(returned_json[:attributes][:unit_price]).to be_a(Float)
+      end
+    end
+
+    describe 'sad path' do
+      it "return an error if any attribute is missing " do
+        merchant = create(:merchant)
+        item_params = ({
+                      description: 'Creates bar magic',
+                      unit_price: 15.99,
+                      merchant_id: merchant.id
+                      })
+        headers = {"CONTENT_TYPE" => "application/json"}
+
+        post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
+        created_item = Item.last
+        returned_json = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(406)
+        expect(created_item).to be_nil
+        expect(returned_json[:message]).to eq("your request cannot be completed")
+        expect(returned_json[:errors]).to be_a(Array)
+        expect(returned_json[:errors][0]).to eq("Name can't be blank")
+      end
+
+      it "ignores any attributes that are not allowed" do
+        merchant = create(:merchant)
+        item_params = ({
+                      name: 'Foo Wand',
+                      description: 'Creates bar magic',
+                      unit_price: 15.99,
+                      merchant_id: merchant.id,
+                      rainbows: "YAY!"
+                      })
+        headers = {"CONTENT_TYPE" => "application/json"}
+
+        post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
+
+        created_item = Item.last
+        returned_json = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(created_item.name).to eq(item_params[:name])
+        expect(created_item.merchant.id).to eq(item_params[:merchant_id])
+        expect(created_item.description).to eq(item_params[:description])
+        expect(created_item.unit_price).to eq(item_params[:unit_price])
+        expect(response).to be_successful
+        expect(response.status).to eq(201)
+        expect(returned_json[:attributes].include?(:rainbows)).to eq(false)
+      end
+    end
+  end
+
+  describe 'udpate an item' do
+    describe 'happy path' do
+      it "updates an item record when provided valid data" do
+        merchant = create(:merchant)
+        item = create(:item)
+        previous_name = Item.last.name
+        previous_description = Item.last.description
+        previous_unit_price = Item.last.unit_price
+        previous_merchant_id = Item.last.merchant_id
+        item_params = ({ name: 'Foo wand',
+                      description: 'Creates bar magic',
+                      unit_price: 15.99,
+                      merchant_id: merchant.id
+                      })
+        headers = {"CONTENT_TYPE" => "application/json"}
+
+        patch "/api/v1/items/#{item.id}", headers: headers, params: JSON.generate(item: item_params)
+        returned_json = JSON.parse(response.body, symbolize_names: true)[:data]
+        item.reload
+
+        expect(item.name).to_not eq(previous_name)
+        expect(item.description).to_not eq(previous_description)
+        expect(item.unit_price).to_not eq(previous_unit_price)
+        expect(item.merchant_id).to_not eq(previous_merchant_id)
+        expect(response).to be_successful
+        expect(response.status).to eq(202)
+        expect(returned_json[:id]).to be_a(String)
+        expect(returned_json[:attributes]).to be_a(Hash)
+        expect(returned_json[:attributes]).to have_key(:name)
+      end
+    end
+
+    describe 'sad path' do
+      it "return an error if the item id is not found" do
+        merchant = create(:merchant)
+        item = create(:item)
+        previous_name = Item.last.name
+        previous_description = Item.last.description
+        previous_unit_price = Item.last.unit_price
+        previous_merchant_id = Item.last.merchant_id
+        item_params = ({ name: 'Foo wand',
+                      description: 'Creates bar magic',
+                      unit_price: 15.99,
+                      merchant_id: merchant.id
+                      })
+        headers = {"CONTENT_TYPE" => "application/json"}
+
+        patch "/api/v1/items/13165413", headers: headers, params: JSON.generate(item: item_params)
+        returned_json = JSON.parse(response.body, symbolize_names: true)[:data]
+        item.reload
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+        expect(item.name).to eq(previous_name)
+        expect(item.description).to eq(previous_description)
+        expect(item.unit_price).to eq(previous_unit_price)
+        expect(item.merchant_id).to eq(previous_merchant_id)
+      end
+
+      it "return an error if the merchant id is not found" do
+        item = create(:item)
+        previous_name = Item.last.name
+        previous_description = Item.last.description
+        previous_unit_price = Item.last.unit_price
+        previous_merchant_id = Item.last.merchant_id
+        item_params = ({ name: 'Foo wand',
+                      description: 'Creates bar magic',
+                      unit_price: 15.99,
+                      merchant_id: 18416546
+                      })
+        headers = {"CONTENT_TYPE" => "application/json"}
+
+        patch "/api/v1/items/#{item.id}", headers: headers, params: JSON.generate(item: item_params)
+        returned_json = JSON.parse(response.body, symbolize_names: true)[:data]
+        item.reload
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(400)
+        expect(item.name).to eq(previous_name)
+        expect(item.description).to eq(previous_description)
+        expect(item.unit_price).to eq(previous_unit_price)
+        expect(item.merchant_id).to eq(previous_merchant_id)
+      end
+    end
   end
 end
