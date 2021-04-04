@@ -25,7 +25,7 @@ describe "Items API" do
       end
 
       it "sends a unique list of up to 20 items per page, and the page results do not repeat" do
-        create_list(:merchant, 41)
+        create_list(:item, 41)
 
         get '/api/v1/items?page=1'
 
@@ -48,8 +48,8 @@ describe "Items API" do
         expect(items2.last[:id].to_i).to eq(items2.first[:id].to_i + 19)
       end
 
-      xit "sends a list of up to 20 items when there are less than that in the DB" do
-        create_list(:merchant, 10)
+      it "sends a list of up to 20 items when there are less than that in the DB" do
+        create_list(:item, 10)
 
         get '/api/v1/items?page=1'
 
@@ -62,8 +62,8 @@ describe "Items API" do
     end
 
     describe 'sad path' do
-      xit "sends a lit of up to 20 items when the page number is 0 or less" do
-        create_list(:merchant, 30)
+      it "sends a lit of up to 20 items when the page number is 0 or less" do
+        create_list(:item, 30)
 
         get '/api/v1/items?page=-1'
 
@@ -79,8 +79,8 @@ describe "Items API" do
 
   describe 'one item' do
     describe 'happy path' do
-      xit "sends a single item by id" do
-        items = create_list(:merchant, 2)
+      it "sends a single item by id" do
+        items = create_list(:item, 2)
         merchant = items.first
 
         get "/api/v1/items/#{merchant.id}"
@@ -100,7 +100,7 @@ describe "Items API" do
     end
 
     describe 'sad path' do
-      xit "returns a 404 when the id is not found" do
+      it "returns a 404 when the id is not found" do
         get '/api/v1/items/8923987297'
 
         data = JSON.parse(response.body, symbolize_names: true)
