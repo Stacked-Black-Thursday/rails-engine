@@ -22,6 +22,8 @@ describe "Items API" do
         expect(items[:data].first[:attributes][:description]).to be_a(String)
         expect(items[:data].first[:attributes]).to have_key(:unit_price)
         expect(items[:data].first[:attributes][:unit_price]).to be_a(Float)
+        expect(items[:data].first[:attributes]).to have_key(:merchant_id)
+        expect(items[:data].first[:attributes][:merchant_id]).to be_a(Integer)
       end
 
       it "sends a unique list of up to 20 items per page, and the page results do not repeat" do
