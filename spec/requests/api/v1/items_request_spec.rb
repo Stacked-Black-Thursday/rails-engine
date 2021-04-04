@@ -83,9 +83,9 @@ describe "Items API" do
     describe 'happy path' do
       it "sends a single item by id" do
         items = create_list(:item, 2)
-        merchant = items.first
+        item = items.first
 
-        get "/api/v1/items/#{merchant.id}"
+        get "/api/v1/items/#{item.id}"
 
         data = JSON.parse(response.body, symbolize_names: true)
 
@@ -274,6 +274,51 @@ describe "Items API" do
         expect(item.description).to eq(previous_description)
         expect(item.unit_price).to eq(previous_unit_price)
         expect(item.merchant_id).to eq(previous_merchant_id)
+      end
+    end
+  end
+
+  describe 'delete an item' do
+    describe 'happy path' do
+      it "destroys the current record when valid id provided" do
+        items = create_list(:item, 2)
+        item_id = items.first.id
+
+        delete "/api/v1/items/#{item_id}"
+
+        expect(response).to be_successful
+        expect(response.status).to eq(204)
+        expect{ Item.find(item_id) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "if a valid item id is the only item on an invoice, the item and invoice are destroyed" do
+        invoices = create_list(:invoice, 2)
+        items = create_list(:item, 2)
+        invoice_1 = invoices.first
+        invoice_2 = invoices.last
+        item_1 = items.first
+        item_2 = items.last
+        invoice_1.items << item_1
+        invoice_2.items << item_1
+        invoice_2.items << item_2
+
+        delete "/api/v1/items/#{item_1.id}"
+
+        expect(response).to be_successful
+        expect(response.status).to eq(204)
+        expect{ Item.find(item_1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect{ Invoice.find(invoice_1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(Invoice.find(invoice_2.id)).to eq(invoice_2)
+      end
+    end
+
+    describe 'sad path' do
+      it "does not destroy the item record when item id is invalid" do
+
+        delete "/api/v1/items/15468456514"
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
       end
     end
   end
