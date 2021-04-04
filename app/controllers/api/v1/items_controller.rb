@@ -19,6 +19,15 @@ class Api::V1::ItemsController < ApplicationController
     end
   end
 
+  def update
+    item = Item.find(params[:id])
+    if item.update(item_params)
+      render json: ItemSerializer.new(item), status: :accepted
+    else
+      render json: { message: "your request cannot be completed", errors: item.errors.full_messages }, status: :bad_request
+    end
+  end
+
   private
 
   def item_params
