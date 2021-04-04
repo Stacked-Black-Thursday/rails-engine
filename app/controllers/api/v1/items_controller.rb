@@ -28,6 +28,17 @@ class Api::V1::ItemsController < ApplicationController
     end
   end
 
+  def destroy
+    item = Item.find(params[:id])
+    invoices = InvoiceItem.where('invoice_id in (?)', item.invoice_items.select('invoice_items.invoice_id')).group(:invoice_id).count
+    if item
+      invoices.each do |invoice_id, item_count|
+        Invoice.destroy(invoice_id) if item_count == 1
+      end
+      Item.destroy(item.id)
+    end
+  end
+
   private
 
   def item_params
