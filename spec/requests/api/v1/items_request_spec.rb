@@ -322,4 +322,36 @@ describe "Items API" do
       end
     end
   end
+
+  describe 'get merchant data for an item' do
+    describe 'happy path' do
+      it "sends the merchant data back for an item with valid id" do
+        merchant = create(:merchant)
+        item = create(:item, merchant_id: merchant.id)
+
+        get "/api/v1/items/#{item.id}/merchant"
+
+        json = JSON.parse(response.body, symbolize_names: true)
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+        expect(json.count).to eq(1)
+        expect(json[:data]).to have_key(:id)
+        expect(json[:data][:id]).to be_a(String)
+        expect(json[:data][:attributes]).to be_a(Hash)
+        expect(json[:data][:attributes]).to have_key(:name)
+        expect(json[:data][:attributes][:name]).to be_a(String)
+      end
+    end
+
+    describe 'sad path' do
+      it "sends an error when the item id is invalid" do
+        get '/api/v1/items/8923987297/merchant'
+
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(response.status).to eq(404)
+        expect(response).to be_not_found
+      end
+    end
+  end
 end
