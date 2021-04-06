@@ -57,7 +57,7 @@ class Api::V1::Items::SearchController < ApplicationController
   def search_by_min_and_max_price(min_price, max_price)
     item = Item.find_one_by_unit_price(min_price, max_price)
     if min_price > max_price
-      render json: { error: "max price cannot less than 0"}, status: :bad_request
+      render json: { error: "min price cannot greater than max price"}, status: :bad_request
     else
       send_json_response(item)
     end
