@@ -23,19 +23,25 @@ class Api::V1::Items::SearchController < ApplicationController
 
   private
 
+  def send_json_response(item)
+    if item
+      render json: ItemSerializer.new(item)
+    else
+      render json: {data: {}}
+    end
+  end
+
   def search_by_name(search_term)
     item = Item.find_one_by_name_fragment(search_term)
-    item ? render json: ItemSerializer.new(item) : render json: {data: {}}
+    send_json_response(item)
   end
 
   def search_by_min_unit_price(min_price)
     item = Item.find_one_by_unit_price(min_price)
     if min_price < 0
       render json: { error: "min price cannot less than 0"}, status: :bad_request
-    elsif item
-      render json: ItemSerializer.new(item)
     else
-      render json: {data: {}}
+      send_json_response(item)
     end
   end
 
@@ -43,10 +49,8 @@ class Api::V1::Items::SearchController < ApplicationController
     item = Item.find_one_by_unit_price(max_price)
     if max_price < 0
       render json: { error: "max price cannot less than 0"}, status: :bad_request
-    elsif item
-      render json: ItemSerializer.new(item)
     else
-      render json: {data: {}}
+      send_json_response(item)
     end
   end
 
@@ -54,10 +58,8 @@ class Api::V1::Items::SearchController < ApplicationController
     item = Item.find_one_by_unit_price(min_price, max_price)
     if min_price > max_price
       render json: { error: "max price cannot less than 0"}, status: :bad_request
-    elsif item
-      render json: ItemSerializer.new(item)
     else
-      render json: {data: {}}
+      send_json_response(item)
     end
   end
 end
