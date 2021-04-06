@@ -4,4 +4,9 @@ class Merchant < ApplicationRecord
   has_many :invoices, through: :invoice_items
   has_many :transactions, through: :invoices
   has_many :customers, through: :invoices
+
+  def self.find_all_by_name_fragment(search_term)
+    where("lower(name) like ?", '%' + search_term + '%')
+    .order(:name)
+  end
 end
