@@ -14,7 +14,7 @@ class Api::V1::Items::SearchController < ApplicationController
     elsif params[:min_price] && params[:max_price]
       min_price = params[:min_price]
       max_price = params[:max_price]
-      item = Item.where('unit_price <= ?', max_price ).where('unit_price >= ?', min_price).order(:name).limit(1).first
+      item = Item.find_one_by_unit_price(min_price, max_price)
       if min_price > max_price
         render json: { error: "max price cannot less than 0"}, status: :bad_request
       elsif item
@@ -24,7 +24,7 @@ class Api::V1::Items::SearchController < ApplicationController
       end
     elsif params[:max_price]
       max_price = params[:max_price].to_f
-      item = Item.where('unit_price <= ?', max_price ).order(:name).limit(1).first
+      item = Item.find_one_by_unit_price(max_price)
       if max_price < 0
         render json: { error: "max price cannot less than 0"}, status: :bad_request
       elsif item
@@ -34,7 +34,7 @@ class Api::V1::Items::SearchController < ApplicationController
       end
     elsif params[:min_price]
       min_price = params[:min_price].to_f
-      item = Item.where('unit_price >= ?', min_price).order(:name).limit(1).first
+      item = Item.find_one_by_unit_price(min_price)
       if min_price < 0
         render json: { error: "min price cannot less than 0"}, status: :bad_request
       elsif item

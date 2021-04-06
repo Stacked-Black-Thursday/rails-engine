@@ -81,6 +81,25 @@ describe 'find a single item' do
       expect(json[:data][:attributes][:name]).to eq(item2.name)
     end
 
+    it "fetches one item when min and max price" do
+      item1 = create(:item, name: "B Item", unit_price: 100.99)
+      item2 = create(:item, name: "A Item", unit_price: 109.99)
+      item3 = create(:item, name: "C Item", unit_price: 300.99)
+      min_price = 100
+      max_price = 200.00
+
+      get "/api/v1/items/find?max_price=#{max_price}&min_price=#{min_price}"
+
+      json = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to be_successful
+      expect(response.status).to eq(200)
+      expect(json.count).to eq(1)
+      expect(json[:data][:id]).to_not eq(item1.id.to_s)
+      expect(json[:data][:id]).to eq(item2.id.to_s)
+      expect(json[:data][:attributes][:name]).to eq(item2.name)
+    end
+
     it "returns 200 but no data if min price is too big" do
       item1 = create(:item, name: "B Item", unit_price: 100.99)
       item2 = create(:item, name: "A Item", unit_price: 99.99)
