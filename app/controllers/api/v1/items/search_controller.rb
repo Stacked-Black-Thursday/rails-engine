@@ -25,11 +25,7 @@ class Api::V1::Items::SearchController < ApplicationController
 
   def search_by_name(search_term)
     item = Item.find_one_by_name_fragment(search_term)
-    if item
-      render json: ItemSerializer.new(item)
-    else
-      render json: {data: {}}
-    end
+    item ? render json: ItemSerializer.new(item) : render json: {data: {}}
   end
 
   def search_by_min_unit_price(min_price)
