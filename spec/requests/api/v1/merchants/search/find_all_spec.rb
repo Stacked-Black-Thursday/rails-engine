@@ -33,11 +33,12 @@ describe 'find a all merchants' do
       get "/api/v1/merchants/find_all?name=#{fragment}"
 
       json = JSON.parse(response.body, symbolize_names: true)
-      
+
       expect(response).to be_successful
       expect(response.status).to eq(200)
       expect(json.count).to eq(1)
       expect(json[:data]).to be_a(Array)
+      expect(json[:data].empty?).to eq(true)
     end
   end
 end
