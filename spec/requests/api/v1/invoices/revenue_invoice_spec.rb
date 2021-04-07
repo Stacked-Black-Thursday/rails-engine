@@ -54,7 +54,7 @@ RSpec.describe 'Revenue for invoices', type: :request do
         expect(json[:data].first[:attributes]).to have_key(:potential_revenue)
         expect(json[:data].first[:attributes][:potential_revenue]).to be_a(Float)
         expect(json[:data].first[:attributes][:potential_revenue]).to eq(20770.0)
-        expect(json[:data].last[:attributes][:potential_revenue]).to eq(100.0)
+        expect(json[:data].second[:attributes][:potential_revenue]).to eq(4000.0)
       end
     end
 
