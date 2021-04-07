@@ -17,4 +17,13 @@ class Merchant < ApplicationRecord
     .pluck('(invoice_items.quantity * items.unit_price) AS revenue')
     .sum
   end
+
+  def self.top_revenue(quantity)
+    select('merchants.*, sum(invoice_items.quantity * invoice_items.unit_price) as revenue')
+    .joins(:transactions)
+    .where('transactions.result = ?', 'success')
+    .group(:id)
+    .order('revenue desc')
+    .limit(quantity)
+  end
 end
