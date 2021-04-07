@@ -173,5 +173,12 @@ describe 'find a single item' do
       expect(response).to_not be_successful
       expect(response.status).to eq(400)
     end
+
+    it "returns 400 if no parameters are given" do
+      get "/api/v1/items/find"
+
+      expect(response).to_not be_successful
+      expect(response.status).to eq(400)
+    end
   end
 end

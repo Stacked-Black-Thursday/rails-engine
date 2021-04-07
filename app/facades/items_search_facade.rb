@@ -1,0 +1,2 @@
+class ItemsSearchFacade
+end

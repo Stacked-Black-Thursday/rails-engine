@@ -11,7 +11,7 @@ describe 'find a all merchants' do
       get "/api/v1/merchants/find_all?name=#{fragment}"
 
       json = JSON.parse(response.body, symbolize_names: true)
-      # require "pry"; binding.pry
+
       expect(response).to be_successful
       expect(response.status).to eq(200)
       expect(json[:data].count).to eq(2)

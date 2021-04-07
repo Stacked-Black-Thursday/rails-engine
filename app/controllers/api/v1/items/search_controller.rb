@@ -1,65 +1,56 @@
 class Api::V1::Items::SearchController < ApplicationController
 
   def show
-    if params[:name] && (params[:min_price] || params[:max_price])
-      render json: { error: "please send name or min and or max price" }, status: :bad_request
-    elsif params[:name]
-      search_term = params[:name].downcase
-      search_by_name(search_term)
-    elsif params[:min_price] && params[:max_price]
-      min_price = params[:min_price]
-      max_price = params[:max_price]
+    min_price = params[:min_price]
+    max_price = params[:max_price]
+    name = params[:name]
+
+    if name && (min_price || max_price)
+      error = "please send name or price parameter, you cannot send both"
+      failed_response(error)
+    elsif name
+      search_by_name(name.downcase)
+    elsif min_price && max_price
       search_by_min_and_max_price(min_price, max_price)
-    elsif params[:max_price]
-      max_price = params[:max_price].to_f
-      search_by_max_price(max_price)
-    elsif params[:min_price]
-      min_price = params[:min_price].to_f
-      search_by_min_unit_price(min_price)
+    elsif max_price
+      search_by_max_price(min_price, max_price)
+    elsif min_price
+      search_by_min_price(min_price, max_price)
     else
-      render json: { error: "please send a query parameter"}, status: :bad_request
+      error = "please send a query parameter"
+      failed_response(error)
     end
   end
 
   private
 
-  def send_json_response(item)
-    if item
-      render json: ItemSerializer.new(item)
-    else
-      render json: {data: {}}
-    end
+  def success_response(item)
+    item ? (render json: ItemSerializer.new(item)) : (render json: {data: {}})
   end
 
-  def search_by_name(search_term)
-    item = Item.find_one_by_name_fragment(search_term)
-    send_json_response(item)
+  def failed_response(error)
+    render json: { error: error}, status: :bad_request
   end
 
-  def search_by_min_unit_price(min_price)
-    item = Item.find_one_by_unit_price(min_price)
-    if min_price < 0
-      render json: { error: "min price cannot less than 0"}, status: :bad_request
-    else
-      send_json_response(item)
-    end
+  def search_by_name(name)
+    success_response(Item.find_one_by_name_fragment(name))
   end
 
-  def search_by_max_price(max_price)
-    item = Item.find_one_by_unit_price(max_price)
-    if max_price < 0
-      render json: { error: "max price cannot less than 0"}, status: :bad_request
-    else
-      send_json_response(item)
-    end
+  def search_by_min_price(min_price, max_price)
+    item = Item.find_one_by_unit_price(min_price, max_price)
+    error = "price cannot less than 0"
+    min_price.to_f < 0 ? failed_response(error) : success_response(item)
+  end
+
+  def search_by_max_price(min_price, max_price)
+    item = Item.find_one_by_unit_price(min_price, max_price)
+    error = "price cannot less than 0"
+    max_price.to_f < 0 ? failed_response(error) : success_response(item)
   end
 
   def search_by_min_and_max_price(min_price, max_price)
     item = Item.find_one_by_unit_price(min_price, max_price)
-    if min_price > max_price
-      render json: { error: "min price cannot greater than max price"}, status: :bad_request
-    else
-      send_json_response(item)
-    end
+    error = "min price cannot greater than max price"
+    min_price > max_price ? failed_response(error) : success_response(item)
   end
 end
