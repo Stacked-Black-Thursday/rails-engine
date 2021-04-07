@@ -19,6 +19,5 @@ class Invoice < ApplicationRecord
     .group('invoices.id')
     .order('potential_revenue desc')
     .limit(quantity)
-    # .round(2)
   end
 end

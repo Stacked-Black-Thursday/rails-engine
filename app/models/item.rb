@@ -8,7 +8,7 @@ class Item < ApplicationRecord
   validates_presence_of [:name, :description, :unit_price, :merchant_id], on: :create
 
   def self.find_one_by_name_fragment(search_term)
-    where("lower(name) like ?", '%' + search_term + '%')
+    where("lower(name) like ?", "%#{search_term}%")
     .order(:name)
     .limit(1)
     .first

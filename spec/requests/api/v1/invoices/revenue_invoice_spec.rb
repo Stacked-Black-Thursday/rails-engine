@@ -75,7 +75,7 @@ RSpec.describe 'Revenue for invoices', type: :request do
         expect(response.status).to eq(400)
       end
 
-      it "returns an error if the quantity is less than 0" do
+      it "returns an error if the quantity is 0 or less" do
         quantity = -1
         get "/api/v1/revenue/unshipped?quantity=#{quantity}"
 
