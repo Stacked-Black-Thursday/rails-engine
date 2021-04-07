@@ -35,4 +35,7 @@ RSpec.describe 'Revenue for a merchant', type: :request do
       end
     end
   end
+
+  describe 'merchants with the most revenue' do
+  end
 end
