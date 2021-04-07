@@ -34,6 +34,17 @@ class Api::V1::ItemsController < ApplicationController
     Item.destroy(item.id)
   end
 
+  def most_revenue
+    quantity = params[:quantity].nil? ? 10 : params[:quantity].to_i
+    if quantity.to_i <= 0
+      error = "invalid quantity parameter, it must be an integer greater than 0"
+      render json: { error: error}, status: :bad_request
+    else
+      @items = Item.top_revenue(quantity)
+      render json: ItemRevenueSerializer.new(@items)
+    end
+  end
+
   private
 
   def item_params
