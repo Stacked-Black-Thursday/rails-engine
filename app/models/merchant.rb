@@ -9,4 +9,12 @@ class Merchant < ApplicationRecord
     where("lower(name) like ?", '%' + search_term + '%')
     .order(:name)
   end
+
+  def total_revenue
+    transactions
+    .where('invoices.status = ?', 'shipped')
+    .where('transactions.result = ?', 'success')
+    .pluck('(invoice_items.quantity * items.unit_price) AS revenue')
+    .sum
+  end
 end
