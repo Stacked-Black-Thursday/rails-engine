@@ -49,7 +49,7 @@ RSpec.describe 'Revenue for a merchant', type: :request do
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(json[:data].count).to eq(7)
+        expect(json[:data].count).to eq(10)
         expect(json[:data].first).to have_key(:id)
         expect(json[:data].first[:id]).to be_a(String)
         expect(json[:data].first[:id]).to eq(@merchant9.id.to_s)
@@ -59,7 +59,7 @@ RSpec.describe 'Revenue for a merchant', type: :request do
         expect(json[:data].first[:attributes]).to have_key(:revenue)
         expect(json[:data].first[:attributes][:revenue]).to be_a(Float)
         expect(json[:data].first[:attributes][:revenue]).to eq(11400.0)
-        expect(json[:data].second[:attributes][:revenue]).to eq(10879.35)
+        expect(json[:data].second[:attributes][:revenue]).to eq(10880.35)
       end
 
       it "top merchant when the quantity 1 is provided" do
@@ -84,7 +84,7 @@ RSpec.describe 'Revenue for a merchant', type: :request do
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(json[:data].count).to eq(7)
+        expect(json[:data].count).to eq(11)
         expect(json[:data].first).to have_key(:id)
         expect(json[:data].first[:id]).to be_a(String)
         expect(json[:data].first[:id]).to eq(@merchant9.id.to_s)

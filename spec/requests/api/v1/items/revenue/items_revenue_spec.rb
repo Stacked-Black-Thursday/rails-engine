@@ -57,7 +57,7 @@ RSpec.describe 'Revenue for items', type: :request do
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(json[:data].count).to eq(12)
+        expect(json[:data].count).to eq(19)
         expect(json[:data].first).to have_key(:id)
         expect(json[:data].first[:id]).to be_a(String)
         expect(json[:data].first[:id]).to eq(@item11.id.to_s)

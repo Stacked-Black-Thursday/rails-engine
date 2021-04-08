@@ -11,6 +11,9 @@ module RequestRevenueRailsHelper
     @merchant9 = create(:merchant, name: "stand by")
     @merchant10 = create(:merchant, name: "one more")
     @merchant11 = create(:merchant, name: "and another")
+    @merchant12 = create(:merchant, name: "and another one")
+    @merchant13 = create(:merchant, name: "and another two")
+    @merchant14 = create(:merchant, name: "and another three")
 
     @item1 = create(:item, unit_price: 4, merchant: @merchant1, name: "item")
     @item2 = create(:item, unit_price: 9, merchant: @merchant1, name: "thing")
@@ -31,7 +34,12 @@ module RequestRevenueRailsHelper
     @item17 = create(:item, unit_price: 1, merchant: @merchant5, name: "Item 17")
     @item18 = create(:item, unit_price: 1, merchant: @merchant5, name: "Item 18")
     @item19 = create(:item, unit_price: 1, merchant: @merchant10, name: "Item 19")
-    @item20 = create(:item, unit_price: 1, merchant: @merchant11, name: "Item 20")
+    @item20 = create(:item, unit_price: 1, merchant: @merchant8, name: "Item 20")
+    @item21 = create(:item, unit_price: 1, merchant: @merchant12, name: "Item 20")
+    @item22 = create(:item, unit_price: 1, merchant: @merchant13, name: "Item 20")
+    @item23 = create(:item, unit_price: 1, merchant: @merchant14, name: "Item 20")
+    @item24 = create(:item, unit_price: 1, merchant: @merchant12, name: "Item 20")
+    @item25 = create(:item, unit_price: 1, merchant: @merchant13, name: "Item 20")
 
     @customer = create(:customer)
 
@@ -74,6 +82,10 @@ module RequestRevenueRailsHelper
     create(:transaction, invoice: @invoice19)
 
 
+    create(:invoice_item, invoice: @invoice1, item: @item1, unit_price: 10, quantity: 5)
+    create(:invoice_item, invoice: @invoice1, item: @item2, unit_price: 5, quantity: 10)
+    create(:invoice_item, invoice: @invoice2, item: @item3, unit_price: 12, quantity: 1)
+    create(:invoice_item, invoice: @invoice2, item: @item6, unit_price: 10, quantity: 50)
     create(:invoice_item, invoice: @invoice3, item: @item4, unit_price: 12.00, quantity: 24)
     create(:invoice_item, invoice: @invoice3, item: @item5, unit_price: 114.50, quantity: 14)
     create(:invoice_item, invoice: @invoice4, item: @item7, unit_price: 12.50, quantity: 125)
@@ -84,13 +96,23 @@ module RequestRevenueRailsHelper
     create(:invoice_item, invoice: @invoice7, item: @item6, unit_price: 19.45, quantity: 55)
     create(:invoice_item, invoice: @invoice8, item: @item8, unit_price: 20.11, quantity: 50)
     create(:invoice_item, invoice: @invoice9, item: @item12, unit_price: 1, quantity: 101)
-    create(:invoice_item, invoice: @invoice19, item: @item20, unit_price: 1, quantity: 1)
+
+    create(:invoice_item, invoice: @invoice2, item: @item21, unit_price: 10, quantity: 10)
+    create(:invoice_item, invoice: @invoice4, item: @item22, unit_price: 1, quantity: 5)
+    create(:invoice_item, invoice: @invoice5, item: @item23, unit_price: 3, quantity: 15)
+    create(:invoice_item, invoice: @invoice1, item: @item24, unit_price: 20, quantity: 10)
+    create(:invoice_item, invoice: @invoice18, item: @item25, unit_price: 1, quantity: 100)
+    create(:invoice_item, invoice: @invoice19, item: @item25, unit_price: 2, quantity: 50)
+
+    create(:invoice_item, invoice: @invoice18, item: @item7, unit_price: 1, quantity: 1)
+    create(:invoice_item, invoice: @invoice18, item: @item8, unit_price: 1, quantity: 1)
+    create(:invoice_item, invoice: @invoice19, item: @item9, unit_price: 1, quantity: 1)
 
     create(:invoice_item, invoice: @invoice1, item: @item12, unit_price: 15.00, quantity: 10)
     create(:invoice_item, invoice: @invoice1, item: @item16, unit_price: 10.01, quantity: 12)
     create(:invoice_item, invoice: @invoice18, item: @item19, unit_price: 10.00, quantity: 5)
-    create(:invoice_item, invoice: @invoice10, item: @item12, unit_price: 10.99, quantity: 178)#fail
-    create(:invoice_item, invoice: @invoice10, item: @item16, unit_price: 10.00, quantity: 45)#fail
+    create(:invoice_item, invoice: @invoice10, item: @item12, unit_price: 10.99, quantity: 178) #fail
+    create(:invoice_item, invoice: @invoice10, item: @item16, unit_price: 10.00, quantity: 45) #fail
 
     create(:invoice_item, invoice: @invoice2, item: @item10, unit_price: 12.00, quantity: 5)
     create(:invoice_item, invoice: @invoice11, item: @item16, unit_price: 1.00, quantity: 250)
