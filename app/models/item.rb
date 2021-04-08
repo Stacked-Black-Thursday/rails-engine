@@ -8,7 +8,7 @@ class Item < ApplicationRecord
   validates_presence_of [:name, :description, :unit_price, :merchant_id], on: :create
 
   def self.find_one_by_name_fragment(search_term)
-    where("lower(name) like ?", '%' + search_term + '%')
+    where("lower(name) like ?", "%#{search_term}%")
     .order(:name)
     .limit(1)
     .first
@@ -22,5 +22,16 @@ class Item < ApplicationRecord
     .order(:name)
     .limit(1)
     .first
+  end
+
+  def self.top_revenue(quantity)
+    select('items.*')
+    .select('sum(invoice_items.quantity * invoice_items.unit_price) as revenue')
+    .joins(:transactions)
+    .where('transactions.result = ?', 'success')
+    .where('invoices.status = ?', 'shipped')
+    .group(:id)
+    .order('revenue desc')
+    .limit(quantity)
   end
 end

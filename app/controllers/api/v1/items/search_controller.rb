@@ -36,6 +36,12 @@ class Api::V1::Items::SearchController < ApplicationController
     success_response(Item.find_one_by_name_fragment(name))
   end
 
+  def validate_min_max_price(min_price, max_price)
+    return true if min_price.to_f < 0
+    return true if max_price.to_f < 0
+    return true if min_price > max_price
+  end
+
   def search_by_min_price(min_price, max_price)
     item = Item.find_one_by_unit_price(min_price, max_price)
     error = "price cannot less than 0"

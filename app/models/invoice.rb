@@ -11,4 +11,13 @@ class Invoice < ApplicationRecord
     invoice_ids = item_invoices.joins(:invoice_items).select(:id).group(:id).having('count(invoice_items.item_id) <= 1').pluck(:id)
     Invoice.destroy(invoice_ids)
   end
+
+  def self.unshipped_potential_revenue(quantity)
+    select('invoices.*, sum(invoice_items.quantity * invoice_items.unit_price) as potential_revenue')
+    .joins(:invoice_items)
+    .where('invoices.status = ?', 'packaged')
+    .group('invoices.id')
+    .order('potential_revenue desc')
+    .limit(quantity)
+  end
 end
