@@ -21,5 +21,38 @@ RSpec.describe Merchant, type: :model do
         expect(Merchant.find_all_by_name_fragment(fragment).include?(merchant3)).to eq(false)
       end
     end
+
+    describe '::top_revenue' do
+      before :each do
+        seed_test_db
+      end
+      it "returns the merchants ranked by top revenue limited based on number provided" do
+        quantity = 5
+        results = Merchant.top_revenue(quantity)
+
+        expect(results.first.revenue).to eq(0.114e5)
+        expect(results.last.revenue).to eq(0.3e3)
+        expect(results.size).to eq(5)
+
+        quantity = 100
+        results = Merchant.top_revenue(quantity)
+
+        expect(results.first.revenue).to eq(0.114e5)
+        expect(results.last.revenue).to eq(0.1e1)
+        expect(results.size).to eq(11)
+      end
+    end
+  end
+
+  describe 'instance methods' do
+    before :each do
+      seed_test_db
+    end
+    it "returns total revenue for a single merchant given" do
+      merchant = @merchant10
+      results = merchant.total_revenue
+
+      expect(results).to eq(0.25e3)
+    end
   end
 end

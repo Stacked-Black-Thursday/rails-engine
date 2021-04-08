@@ -44,13 +44,20 @@ RSpec.describe Item, type: :model do
       before :each do
         seed_test_db
       end
-      it "returns the total revenue for items limiting the results based on number provided" do
+      it "returns the items ranked by top revenue limited based on number provided" do
         quantity = 10
         results = Item.top_revenue(quantity)
 
         expect(results.first.revenue).to eq(0.114e5)
         expect(results.last.revenue).to eq(0.1e3)
         expect(results.size).to eq(10)
+
+        quantity = 100
+        results = Item.top_revenue(quantity)
+
+        expect(results.first.revenue).to eq(0.114e5)
+        expect(results.last.revenue).to eq(0.1e1)
+        expect(results.size).to eq(19)
       end
     end
   end
