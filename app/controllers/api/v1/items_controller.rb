@@ -30,7 +30,8 @@ class Api::V1::ItemsController < ApplicationController
 
   def destroy
     item = Item.find(params[:id])
-    invoices = Invoice.destroy_invoice_only_one_item(item.id)
+    invoices = Invoice.invoices_only_one_item(item.id)
+    Invoice.destroy(invoices)
     Item.destroy(item.id)
   end
 

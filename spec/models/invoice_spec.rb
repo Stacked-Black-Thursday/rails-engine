@@ -11,8 +11,8 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe 'class methods' do
-    describe '::destroy_invoice_only_one_item' do
-      it "it destroys any invoice that has only a single item when that item is destroyed" do
+    describe '::invoices_only_one_item' do
+      it "it returns invoice ids that have a given item and that is the only item on the invoice" do
         invoices = create_list(:invoice, 2)
         items = create_list(:item, 2)
         invoice_1 = invoices.first
@@ -22,10 +22,9 @@ RSpec.describe Invoice, type: :model do
         invoice_1.items << item_1
         invoice_2.items << item_1
         invoice_2.items << item_2
-        Invoice.destroy_invoice_only_one_item(item_1.id)
+        Invoice.invoices_only_one_item(item_1.id)
 
-        expect{ Invoice.find(invoice_1.id) }.to raise_error(ActiveRecord::RecordNotFound)
-        expect(Invoice.find(invoice_2.id)).to eq(invoice_2)
+        expect(Invoice.invoices_only_one_item(item_1.id)).to eq([invoice_1.id])
       end
     end
 
