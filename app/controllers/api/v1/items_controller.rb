@@ -3,28 +3,29 @@ class Api::V1::ItemsController < ApplicationController
 
   def index
     items = Item.limit(@per_page).offset((@page - 1) * @per_page)
-    render json: ItemSerializer.new(items)
+    render_success(ItemSerializer, items)
   end
 
   def show
-    render json: ItemSerializer.new(Item.find(params[:id]))
+    item = Item.find(params[:id])
+    render_success(ItemSerializer, item)
   end
 
   def create
     item = Item.new(item_params)
     if item.save
-      render json: ItemSerializer.new(item), status: :created
+      render_success(ItemSerializer, item, :created)
     else
-      render json: { message: "your request cannot be completed", errors: item.errors.full_messages }, status: :not_acceptable
+      render_error(item.errors.full_messages, :not_acceptable)
     end
   end
 
   def update
     item = Item.find(params[:id])
     if item.update(item_params)
-      render json: ItemSerializer.new(item), status: :accepted
+      render_success(ItemSerializer, item, :accepted)
     else
-      render json: { message: "your request cannot be completed", errors: item.errors.full_messages }, status: :bad_request
+      render_error(item.errors.full_messages)
     end
   end
 
@@ -39,10 +40,10 @@ class Api::V1::ItemsController < ApplicationController
     quantity = params[:quantity].nil? ? 10 : params[:quantity].to_i
     if quantity.to_i <= 0
       error = "invalid quantity parameter, it must be an integer greater than 0"
-      render json: { error: error}, status: :bad_request
+      render_error(error)
     else
-      @items = Item.top_revenue(quantity)
-      render json: ItemRevenueSerializer.new(@items)
+      items = Item.top_revenue(quantity)
+      render_success(ItemRevenueSerializer, items)
     end
   end
 

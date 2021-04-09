@@ -173,8 +173,8 @@ describe "Items API" do
         expect(response.status).to eq(406)
         expect(created_item).to be_nil
         expect(returned_json[:message]).to eq("your request cannot be completed")
-        expect(returned_json[:errors]).to be_a(Array)
-        expect(returned_json[:errors][0]).to eq("Name can't be blank")
+        expect(returned_json[:error]).to be_a(Array)
+        expect(returned_json[:error][0]).to eq("Name can't be blank")
       end
 
       it "ignores any attributes that are not allowed" do
