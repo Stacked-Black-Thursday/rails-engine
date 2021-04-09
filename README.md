@@ -3,7 +3,7 @@
 ### Created by: [Genevieve Nuebel](https://github.com/Gvieve)
 
 
-Rails engine provides foundational API endpoints that can be adopted for a basic e-commerce sales platform. It uses and provides the a starting point for a common database schema, which includes sample records for merchants, items, invoices, customers, and transactions.
+Rails engine provides foundational API endpoints that can be adopted for a basic e-commerce sales platform. It provides a starting point for a useful database schema, which includes sample records for merchants, items, invoices, customers, and transactions.
 
 #### Built With
 * [Ruby on Rails](https://rubyonrails.org)
