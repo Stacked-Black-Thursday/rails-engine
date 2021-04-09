@@ -5,7 +5,7 @@ module Validatable
     params[:quantity].nil? ? 10 : params[:quantity].to_i
   end
 
-  def valid_quantity?
+  def invalid_quantity?
     quantity.to_i <= 0
   end
 

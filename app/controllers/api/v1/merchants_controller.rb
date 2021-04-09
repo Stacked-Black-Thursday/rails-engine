@@ -18,7 +18,7 @@ class Api::V1::MerchantsController < ApplicationController
 
   def most_revenue
     error = "invalid quantity parameter, it must be an integer greater than 0"
-    return render_error(error) if quantity_nil? || valid_quantity?
+    return render_error(error) if quantity_nil? || invalid_quantity?
     merchants = Merchant.top_revenue(quantity)
     render_success(MerchantNameRevenueSerializer, merchants)
   end

@@ -34,7 +34,7 @@ class Api::V1::ItemsController < ApplicationController
 
   def most_revenue
     error = "quantity must be an integer greater than 0"
-    return render_error(error) if valid_quantity?
+    return render_error(error) if invalid_quantity?
     render_success(ItemRevenueSerializer, Item.top_revenue(quantity))
   end
 
