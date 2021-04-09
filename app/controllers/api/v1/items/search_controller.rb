@@ -5,7 +5,7 @@ class Api::V1::Items::SearchController < ApplicationController
     error = "please send a valid query parameter"
     return render_error(error) if invalid_query_params?
     return success_response(Item.find_one_by_name_fragment(name.downcase)) if name
-    success_response(Item.find_one_by_unit_price(min_price, max_price))
+    success_response(Item.find_one_by_unit_price(min_price, max_price)) if min_or_max?
   end
 
   private
