@@ -6,10 +6,9 @@ class Invoice < ApplicationRecord
   has_many :items, through: :invoice_items
   has_many :merchants, through: :items
 
-  def self.destroy_invoice_only_one_item(item_id)
+  def self.invoices_only_one_item(item_id)
     item_invoices = Item.find(item_id).invoices
-    invoice_ids = item_invoices.joins(:invoice_items).select(:id).group(:id).having('count(invoice_items.item_id) <= 1').pluck(:id)
-    Invoice.destroy(invoice_ids)
+    item_invoices.joins(:invoice_items).select(:id).group(:id).having('count(invoice_items.item_id) <= 1').pluck(:id)
   end
 
   def self.unshipped_potential_revenue(quantity)

@@ -1,48 +1,41 @@
 class Api::V1::ItemsController < ApplicationController
+  include Validatable
+
+  before_action :pagination, only: :index
 
   def index
-    page = params[:page] && params[:page].to_i >= 1 ? params.fetch(:page).to_i : 1
-    per_page = params[:per_page] ? params.fetch(:per_page).to_i : 20
-    render json: ItemSerializer.new(Item.limit(per_page).offset((page - 1) * per_page))
+    items = Item.limit(@per_page).offset((@page - 1) * @per_page)
+    render_success(ItemSerializer, items)
   end
 
   def show
-    render json: ItemSerializer.new(Item.find(params[:id]))
+    item = Item.find(params[:id])
+    render_success(ItemSerializer, item)
   end
 
   def create
     item = Item.new(item_params)
-    if item.save
-      render json: ItemSerializer.new(item), status: :created
-    else
-      render json: { message: "your request cannot be completed", errors: item.errors.full_messages }, status: :not_acceptable
-    end
+    return render_success(ItemSerializer, item, :created) if item.save
+    render_error(item.errors.full_messages, :not_acceptable)
   end
 
   def update
     item = Item.find(params[:id])
-    if item.update(item_params)
-      render json: ItemSerializer.new(item), status: :accepted
-    else
-      render json: { message: "your request cannot be completed", errors: item.errors.full_messages }, status: :bad_request
-    end
+    return render_success(ItemSerializer, item, :accepted) if item.update(item_params)
+    render_error(item.errors.full_messages)
   end
 
   def destroy
     item = Item.find(params[:id])
-    invoices = Invoice.destroy_invoice_only_one_item(item.id)
+    invoices = Invoice.invoices_only_one_item(item.id)
+    Invoice.destroy(invoices)
     Item.destroy(item.id)
   end
 
   def most_revenue
-    quantity = params[:quantity].nil? ? 10 : params[:quantity].to_i
-    if quantity.to_i <= 0
-      error = "invalid quantity parameter, it must be an integer greater than 0"
-      render json: { error: error}, status: :bad_request
-    else
-      @items = Item.top_revenue(quantity)
-      render json: ItemRevenueSerializer.new(@items)
-    end
+    error = "quantity must be an integer greater than 0"
+    return render_error(error) if invalid_quantity?
+    render_success(ItemRevenueSerializer, Item.top_revenue(quantity))
   end
 
   private

@@ -4,68 +4,81 @@ describe "Items API" do
   describe 'all items' do
     describe "happy path" do
       it "sends a list of items up to 20 items" do
-        create_list(:item, 30)
+        items = create_list(:item, 30)
 
         get '/api/v1/items'
 
-        items = JSON.parse(response.body, symbolize_names: true)
+        json = JSON.parse(response.body, symbolize_names: true)
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(items[:data].count).to eq(20)
-        expect(items[:data].first).to have_key(:id)
-        expect(items[:data].first[:id]).to be_a(String)
-        expect(items[:data].first[:attributes]).to be_a(Hash)
-        expect(items[:data].first[:attributes]).to have_key(:name)
-        expect(items[:data].first[:attributes][:name]).to be_a(String)
-        expect(items[:data].first[:attributes]).to have_key(:description)
-        expect(items[:data].first[:attributes][:description]).to be_a(String)
-        expect(items[:data].first[:attributes]).to have_key(:unit_price)
-        expect(items[:data].first[:attributes][:unit_price]).to be_a(Float)
-        expect(items[:data].first[:attributes]).to have_key(:merchant_id)
-        expect(items[:data].first[:attributes][:merchant_id]).to be_a(Integer)
+        expect(json[:data].count).to eq(20)
+        expect(json[:data].first).to have_key(:id)
+        expect(json[:data].first[:id]).to be_a(String)
+        expect(json[:data].first[:attributes]).to be_a(Hash)
+        expect(json[:data].first[:attributes]).to have_key(:name)
+        expect(json[:data].first[:attributes][:name]).to be_a(String)
+        expect(json[:data].first[:attributes]).to have_key(:description)
+        expect(json[:data].first[:attributes][:description]).to be_a(String)
+        expect(json[:data].first[:attributes]).to have_key(:unit_price)
+        expect(json[:data].first[:attributes][:unit_price]).to be_a(Float)
+        expect(json[:data].first[:attributes]).to have_key(:merchant_id)
+        expect(json[:data].first[:attributes][:merchant_id]).to be_a(Integer)
       end
 
       it "sends a unique list of up to 20 items per page, and the page results do not repeat" do
-        create_list(:item, 41)
+        items = create_list(:item, 41)
 
         get '/api/v1/items?page=1'
 
-        items1 = JSON.parse(response.body, symbolize_names: true)[:data]
+        json1 = JSON.parse(response.body, symbolize_names: true)[:data]
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(items1.count).to eq(20)
-        expect(items1.second[:id].to_i).to eq(items1.first[:id].to_i + 1)
-        expect(items1.last[:id].to_i).to eq(items1.first[:id].to_i + 19)
+        expect(json1.count).to eq(20)
+        expect(json1.second[:id].to_i).to eq(json1.first[:id].to_i + 1)
+        expect(json1.last[:id].to_i).to eq(json1.first[:id].to_i + 19)
 
         get '/api/v1/items?page=2'
 
-        items2 = JSON.parse(response.body, symbolize_names: true)[:data]
+        json2 = JSON.parse(response.body, symbolize_names: true)[:data]
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(items2.count).to eq(20)
-        expect(items2.first[:id].to_i).to eq(items1.first[:id].to_i + 20)
-        expect(items2.second[:id].to_i).to eq(items2.first[:id].to_i + 1)
-        expect(items2.last[:id].to_i).to eq(items2.first[:id].to_i + 19)
+        expect(json2.count).to eq(20)
+        expect(json2.first[:id].to_i).to eq(json1.first[:id].to_i + 20)
+        expect(json2.second[:id].to_i).to eq(json2.first[:id].to_i + 1)
+        expect(json2.last[:id].to_i).to eq(json2.first[:id].to_i + 19)
       end
 
       it "sends a list of up to 20 items when there are less than that in the DB" do
-        create_list(:item, 10)
+        items = create_list(:item, 10)
 
         get '/api/v1/items?page=1'
 
-        items = JSON.parse(response.body, symbolize_names: true)[:data]
+        json = JSON.parse(response.body, symbolize_names: true)[:data]
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(items.count).to eq(10)
+        expect(json.count).to eq(10)
+      end
+
+      it "sends list of items using per_page parameter that limits the returned results" do
+        items = create_list(:item, 51)
+
+        get '/api/v1/items?per_page=50'
+
+        json = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+        expect(json.count).to eq(50)
+        expect(json.last[:id]).to_not eq(items.last.id.to_s)
       end
     end
 
     describe 'sad path' do
-      it "sends a lit of up to 20 items when the page number is 0 or less" do
-        create_list(:item, 30)
+      it "sends a list of up to 20 items when the page number is 0 or less" do
+        items = create_list(:item, 30)
 
         get '/api/v1/items?page=-1'
 
@@ -87,17 +100,17 @@ describe "Items API" do
 
         get "/api/v1/items/#{item.id}"
 
-        data = JSON.parse(response.body, symbolize_names: true)
+        json = JSON.parse(response.body, symbolize_names: true)
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(data.count).to eq(1)
-        expect(data[:data]).to have_key(:id)
-        expect(data[:data][:id]).to be_a(String)
-        expect(data[:data][:id]).to_not eq(items.last.id)
-        expect(data[:data][:attributes]).to be_a(Hash)
-        expect(data[:data][:attributes]).to have_key(:name)
-        expect(data[:data][:attributes][:name]).to be_a(String)
+        expect(json.count).to eq(1)
+        expect(json[:data]).to have_key(:id)
+        expect(json[:data][:id]).to be_a(String)
+        expect(json[:data][:id]).to_not eq(items.last.id)
+        expect(json[:data][:attributes]).to be_a(Hash)
+        expect(json[:data][:attributes]).to have_key(:name)
+        expect(json[:data][:attributes][:name]).to be_a(String)
       end
     end
 
@@ -105,7 +118,6 @@ describe "Items API" do
       it "returns a 404 when the id is not found" do
         get '/api/v1/items/8923987297'
 
-        data = JSON.parse(response.body, symbolize_names: true)
         expect(response.status).to eq(404)
         expect(response).to be_not_found
       end
@@ -161,8 +173,8 @@ describe "Items API" do
         expect(response.status).to eq(406)
         expect(created_item).to be_nil
         expect(returned_json[:message]).to eq("your request cannot be completed")
-        expect(returned_json[:errors]).to be_a(Array)
-        expect(returned_json[:errors][0]).to eq("Name can't be blank")
+        expect(returned_json[:error]).to be_a(Array)
+        expect(returned_json[:error][0]).to eq("Name can't be blank")
       end
 
       it "ignores any attributes that are not allowed" do
@@ -341,6 +353,7 @@ describe "Items API" do
         expect(json[:data][:attributes]).to be_a(Hash)
         expect(json[:data][:attributes]).to have_key(:name)
         expect(json[:data][:attributes][:name]).to be_a(String)
+        expect(json[:data][:attributes][:name]).to eq(merchant.name)
       end
     end
 
@@ -348,7 +361,6 @@ describe "Items API" do
       it "sends an error when the item id is invalid" do
         get '/api/v1/items/8923987297/merchant'
 
-        data = JSON.parse(response.body, symbolize_names: true)
         expect(response.status).to eq(404)
         expect(response).to be_not_found
       end

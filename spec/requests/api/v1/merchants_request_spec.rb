@@ -4,44 +4,45 @@ describe "Merchants API" do
   describe 'all merchants' do
     describe "happy path" do
       it "sends a list of merchants up to 20 merchants" do
-        create_list(:merchant, 30)
+        merchants = create_list(:merchant, 30)
 
         get '/api/v1/merchants'
 
-        merchants = JSON.parse(response.body, symbolize_names: true)
+        json = JSON.parse(response.body, symbolize_names: true)
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(merchants[:data].count).to eq(20)
-        expect(merchants[:data].first).to have_key(:id)
-        expect(merchants[:data].first[:id]).to be_a(String)
-        expect(merchants[:data].first[:attributes]).to be_a(Hash)
-        expect(merchants[:data].first[:attributes]).to have_key(:name)
-        expect(merchants[:data].first[:attributes][:name]).to be_a(String)
+        expect(json[:data].count).to eq(20)
+        expect(json[:data].first).to have_key(:id)
+        expect(json[:data].first[:id]).to be_a(String)
+        expect(json[:data].first[:attributes]).to be_a(Hash)
+        expect(json[:data].first[:attributes]).to have_key(:name)
+        expect(json[:data].first[:attributes][:name]).to be_a(String)
       end
 
       it "sends a unique list of up to 20 merchants per page, and the page results do not repeat" do
-        create_list(:merchant, 41)
+        merchants = create_list(:merchant, 41)
+        page_limit = 20
 
         get '/api/v1/merchants?page=1'
 
-        merchants1 = JSON.parse(response.body, symbolize_names: true)[:data]
+        json1 = JSON.parse(response.body, symbolize_names: true)[:data]
 
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(merchants1.count).to eq(20)
-        expect(merchants1.second[:id].to_i).to eq(merchants1.first[:id].to_i + 1)
-        expect(merchants1.last[:id].to_i).to eq(merchants1.first[:id].to_i + 19)
+        expect(json1.count).to eq(20)
+        expect(json1.second[:id].to_i).to eq(json1.first[:id].to_i + (page_limit/page_limit))
+        expect(json1.last[:id].to_i).to eq(json1.first[:id].to_i + (page_limit - 1))
 
         get '/api/v1/merchants?page=2'
 
-        merchants2 = JSON.parse(response.body, symbolize_names: true)[:data]
+        json2 = JSON.parse(response.body, symbolize_names: true)[:data]
         expect(response).to be_successful
         expect(response.status).to eq(200)
-        expect(merchants2.count).to eq(20)
-        expect(merchants2.first[:id].to_i).to eq(merchants1.first[:id].to_i + 20)
-        expect(merchants2.second[:id].to_i).to eq(merchants2.first[:id].to_i + 1)
-        expect(merchants2.last[:id].to_i).to eq(merchants2.first[:id].to_i + 19)
+        expect(json2.count).to eq(20)
+        expect(json2.first[:id].to_i).to eq(json1.first[:id].to_i + page_limit)
+        expect(json2.second[:id].to_i).to eq(json2.first[:id].to_i + (page_limit/page_limit))
+        expect(json2.last[:id].to_i).to eq(json2.first[:id].to_i + (page_limit - 1))
       end
 
       it "sends a list of up to 20 merchants when there are less than that in the DB" do
@@ -54,6 +55,19 @@ describe "Merchants API" do
         expect(response).to be_successful
         expect(response.status).to eq(200)
         expect(merchants.count).to eq(10)
+      end
+
+      it "sends list of merchants using per_page parameter that limits the returned results" do
+        merchants = create_list(:merchant, 51)
+
+        get '/api/v1/merchants?per_page=50'
+
+        json = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(response).to be_successful
+        expect(response.status).to eq(200)
+        expect(json.count).to eq(50)
+        expect(json.last[:id]).to_not eq(merchants.last.id.to_s)
       end
     end
 
