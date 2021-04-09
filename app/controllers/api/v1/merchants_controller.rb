@@ -1,4 +1,6 @@
 class Api::V1::MerchantsController < ApplicationController
+  include Validatable
+
   before_action :pagination, only: :index
 
   def index
@@ -15,13 +17,9 @@ class Api::V1::MerchantsController < ApplicationController
   end
 
   def most_revenue
-    quantity = params[:quantity].to_i if params[:quantity]
-    if quantity.to_i <= 0 || params[:quantity].nil?
-      error = "invalid quantity parameter, it must be an integer greater than 0"
-      render_error(error)
-    else
-      merchants = Merchant.top_revenue(quantity)
-      render_success(MerchantNameRevenueSerializer, merchants)
-    end
+    error = "invalid quantity parameter, it must be an integer greater than 0"
+    return render_error(error) if quantity_nil? || valid_quantity?
+    merchants = Merchant.top_revenue(quantity)
+    render_success(MerchantNameRevenueSerializer, merchants)
   end
 end

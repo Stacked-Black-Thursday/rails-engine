@@ -1,4 +1,6 @@
 class Api::V1::ItemsController < ApplicationController
+  include Validatable
+
   before_action :pagination, only: :index
 
   def index
@@ -13,20 +15,14 @@ class Api::V1::ItemsController < ApplicationController
 
   def create
     item = Item.new(item_params)
-    if item.save
-      render_success(ItemSerializer, item, :created)
-    else
-      render_error(item.errors.full_messages, :not_acceptable)
-    end
+    return render_success(ItemSerializer, item, :created) if item.save
+    render_error(item.errors.full_messages, :not_acceptable)
   end
 
   def update
     item = Item.find(params[:id])
-    if item.update(item_params)
-      render_success(ItemSerializer, item, :accepted)
-    else
-      render_error(item.errors.full_messages)
-    end
+    return render_success(ItemSerializer, item, :accepted) if item.update(item_params)
+    render_error(item.errors.full_messages)
   end
 
   def destroy
@@ -37,14 +33,9 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def most_revenue
-    quantity = params[:quantity].nil? ? 10 : params[:quantity].to_i
-    if quantity.to_i <= 0
-      error = "invalid quantity parameter, it must be an integer greater than 0"
-      render_error(error)
-    else
-      items = Item.top_revenue(quantity)
-      render_success(ItemRevenueSerializer, items)
-    end
+    error = "quantity must be an integer greater than 0"
+    return render_error(error) if valid_quantity?
+    render_success(ItemRevenueSerializer, Item.top_revenue(quantity))
   end
 
   private
