@@ -4,8 +4,18 @@ orbs:
 
 jobs:
   build:
+    working_directory: ~/rails-engine
     docker:
       - image: circleci/ruby:2.5.3-stretch-node
+        environment:
+          PGHOST: localhost
+          PGUSER: rails-engine
+          RAILS_ENV: test
+      - image: postgres:13.2
+        environment:
+          POSTGRES_USER: rails-engine
+          POSTGRES_DB: rails-engine_test
+          POSTGRES_PASSWORD:
     executor: ruby/default
     steps:
       - checkout
@@ -14,3 +24,8 @@ jobs:
           name: Which bundler?
           command: bundle -v
       - ruby/bundle-install
+
+      - checkout
+      - run: bundle install --path vendor/bundle
+      - run: bundle exec rake db:setup
+      - run: bundle exec rspec
